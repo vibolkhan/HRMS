@@ -10,6 +10,7 @@ import Contracts from './views/Contracts';
 import PayrollList from './views/PayrollList';
 import PayrollInputs from './views/PayrollInputs';
 import PayrollStructure from './views/PayrollStructure';
+import PayrollHistory from './views/PayrollHistory';
 import MyProfile from './views/MyProfile';
 
 const MOCK_EMPLOYEES: Employee[] = [
@@ -57,13 +58,20 @@ const App: React.FC = () => {
     }
 
     if (activeTab === 'employees') {
-      return subView === 'profile' 
-        ? <EmployeeProfile employee={selectedEmployee} /> 
-        : <EmployeeList 
-            employees={MOCK_EMPLOYEES} 
-            selectedId={selectedEmployeeId} 
-            onSelect={(id) => handleSelectEmployee(id, 'profile')} 
-          />;
+      if (subView === 'profile') {
+        return <EmployeeProfile 
+          employee={selectedEmployee} 
+          onShowHistory={() => setSubView('history')} 
+        />;
+      }
+      if (subView === 'history') {
+        return <PayrollHistory employee={selectedEmployee} />;
+      }
+      return <EmployeeList 
+          employees={MOCK_EMPLOYEES} 
+          selectedId={selectedEmployeeId} 
+          onSelect={(id) => handleSelectEmployee(id, 'profile')} 
+        />;
     }
 
     if (activeTab === 'profile') {
@@ -75,7 +83,11 @@ const App: React.FC = () => {
 
   const getTitle = () => {
     if (activeTab === 'home') return 'HR & Payroll Portal';
-    if (activeTab === 'employees') return subView === 'profile' ? 'Employee Profile' : 'Employees';
+    if (activeTab === 'employees') {
+      if (subView === 'profile') return 'Employee Profile';
+      if (subView === 'history') return 'Payroll History';
+      return 'Employees';
+    }
     if (activeTab === 'payroll') {
       if (!subView) return 'Payroll Batch (Oct)';
       return subView === 'structure' ? 'Salary Structure' : 'Process Payroll';
@@ -87,7 +99,6 @@ const App: React.FC = () => {
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
-    // Reset subview when moving to root tabs, except for payroll where we usually start at list
     if (tab === 'home' || tab === 'profile' || tab === 'payroll' || tab === 'employees') {
       setSubView(null);
     }
@@ -99,10 +110,16 @@ const App: React.FC = () => {
       onTabChange={handleTabChange}
       title={getTitle()}
       showBack={subView !== null}
-      onBack={() => setSubView(null)}
+      onBack={() => {
+        if (subView === 'history') {
+          setSubView('profile');
+        } else {
+          setSubView(null);
+        }
+      }}
       showSettings={activeTab === 'profile' || subView === 'profile'}
       headerAction={
-        (activeTab === 'payroll' && subView) || activeTab === 'requests' ? (
+        ((activeTab === 'payroll' && subView) || activeTab === 'requests') ? (
           <button className="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-lg">Save</button>
         ) : null
       }

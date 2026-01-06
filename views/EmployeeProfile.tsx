@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { Phone, Mail, Edit2, Download, AlertTriangle, ChevronDown, User, Briefcase, Shield, FolderOpen, ChevronRight } from 'lucide-react';
+import { Phone, Mail, Edit2, Download, AlertTriangle, ChevronDown, User, Briefcase, Shield, FolderOpen, ChevronRight, DollarSign } from 'lucide-react';
 import { Employee } from '../types';
 
 interface EmployeeProfileProps {
   employee: Employee;
+  onShowHistory?: () => void;
 }
 
-const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employee }) => {
+const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employee, onShowHistory }) => {
   const sections = [
     { title: 'Personal Information', icon: User, isOpen: true },
     { title: 'Employment Details', icon: Briefcase, isOpen: false },
@@ -40,14 +41,15 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employee }) => {
         </span>
 
         {/* Action Buttons */}
-        <div className="flex justify-between w-full mt-8 px-2">
+        <div className="flex justify-between w-full mt-8 px-2 overflow-x-auto gap-4 scrollbar-hide">
           {[
             { icon: Phone, label: 'Call' },
             { icon: Mail, label: 'Email' },
+            { icon: DollarSign, label: 'Payroll', onClick: onShowHistory },
             { icon: Edit2, label: 'Edit' },
             { icon: Download, label: 'CV' },
           ].map((action, idx) => (
-            <div key={idx} className="flex flex-col items-center gap-2 cursor-pointer group">
+            <div key={idx} className="flex flex-col items-center gap-2 cursor-pointer group shrink-0" onClick={action.onClick}>
               <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center transition-all group-hover:bg-blue-600 group-hover:text-white shadow-sm">
                 <action.icon className="w-6 h-6" />
               </div>
